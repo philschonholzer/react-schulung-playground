@@ -1,12 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
 import ArticleList from '../components/article/article-list'
+import CartContent from '../components/cart/cart-content'
 ---
 
 <Layout title="Welcome to Astro.">
 	<main>
-		<ArticleList>
+		<ArticleList client:load />
+		<aside>
+			<CartContent client:load />
+		</aside>
 	</main>
 </Layout>
 
