@@ -1,14 +1,14 @@
-import { useCartStore } from "./use-cart";
+import { useArticles, useTotalPrice } from "./use-cart";
 
 export default function CartContent() {
-  const cart = useCartStore();
-  // const articles = useCartStore((state) => state.articles);
+  const price = useTotalPrice();
+  const articles = useArticles();
   return (
     <div>
-      <h2>Warenkorb</h2>
+      <h2 className="text-xl font-bold">Warenkorb</h2>
       <ul>
-        {cart.articles.length > 0 ? (
-          cart.articles.map((article) => (
+        {articles.length > 0 ? (
+          articles.map((article) => (
             <li key={article.id}>
               {article.name} {article.description}
             </li>
@@ -17,7 +17,7 @@ export default function CartContent() {
           <li>Der Warenkorb ist leer</li>
         )}
       </ul>
-      {cart.total > 0 && <div>{cart.total}</div>}
+      {price > 0 && <div>CHF {price}</div>}
     </div>
   );
 }
