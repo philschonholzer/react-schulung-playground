@@ -2,6 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 import ArticleList from "../components/article/article-list";
 import CartContent from "../components/cart/cart-content";
+
+const response = await fetch("http://localhost:3004/articles");
+const articles = await response.json();
 ---
 
 <Layout title="Welcome to Astro.">
@@ -9,7 +12,7 @@ import CartContent from "../components/cart/cart-content";
     <h1 class="text-4xl font-bold">Shop</h1>
     <div class="flex flex-col md:flex-row gap-16">
       <div class="space-y-4 flex-1">
-        <ArticleList client:load />
+        <ArticleList articles={articles} client:load />
       </div>
       <aside class="basis-48">
         <CartContent client:load />
