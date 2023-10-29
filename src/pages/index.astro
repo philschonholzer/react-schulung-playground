@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import ArticleList from "../components/article/article-list";
-import CartContent from "../components/cart/cart-content";
+import Cart from "../components/cart/cart-loader";
 ---
 
 <Layout title="Welcome to Astro.">
@@ -12,7 +12,7 @@ import CartContent from "../components/cart/cart-content";
         <ArticleList client:load />
       </div>
       <aside class="basis-48">
-        <CartContent client:load />
+        <Cart client:load />
       </aside>
     </div>
   </main>

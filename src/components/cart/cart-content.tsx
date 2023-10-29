@@ -1,14 +1,19 @@
-import { useArticles, useTotalPrice } from "./use-cart";
+import useCart from "./use-cart";
 
 export default function CartContent() {
-  const price = useTotalPrice();
-  const articles = useArticles();
+  const { query } = useCart();
+  if (query.isLoading) {
+    return <div>Lade Warenkorb...</div>;
+  }
+  if (query.error) {
+    return <div>Fehler</div>;
+  }
   return (
     <div>
       <h2 className="text-xl font-bold">Warenkorb</h2>
       <ul>
-        {articles.length > 0 ? (
-          articles.map((article) => (
+        {query.data && query.data.articles.length > 0 ? (
+          query.data.articles.map((article) => (
             <li key={article.id}>
               {article.name} {article.description}
             </li>
@@ -17,7 +22,6 @@ export default function CartContent() {
           <li>Der Warenkorb ist leer</li>
         )}
       </ul>
-      {price > 0 && <div>CHF {price}</div>}
     </div>
   );
 }

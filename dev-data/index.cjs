@@ -13,5 +13,5 @@ module.exports = () => {
     makeArticle({ id: 2, description: "Rot" }),
     makeArticle({ id: 3, description: "Grün" }),
   ];
-  return { articles };
+  return { articles, cart: { articles: [articles[0]] } };
 };

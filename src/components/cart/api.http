@@ -1,0 +1,17 @@
+GET http://127.0.0.1:3004/cart HTTP/1.1
+
+
+###
+
+
+PATCH http://127.0.0.1:3004/cart HTTP/1.1
+content-type: application/json
+
+{
+    "articles": [{
+      "id": 7,
+      "name": "T-Shirt",
+      "description": "Violett",
+      "price": 22
+    }]
+}

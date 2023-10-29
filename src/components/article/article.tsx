@@ -1,7 +1,8 @@
 import type { Article } from "../../domain/article/types";
-import { addArticle } from "../cart/use-cart";
+import useCart from "../cart/use-cart";
 
 export default function Article(props: { article: Article }) {
+  const { mutation } = useCart();
   return (
     <div className="flex flex-col justify-between gap-4 rounded border border-blue-200 bg-blue-50 p-4 md:flex-row md:items-end">
       <div>
@@ -11,7 +12,7 @@ export default function Article(props: { article: Article }) {
       </div>
       <button
         className="rounded bg-blue-900 px-6 py-1 text-white"
-        onClick={() => addArticle(props.article)}
+        onClick={() => mutation.mutate(props.article)}
       >
         Add to cart
       </button>

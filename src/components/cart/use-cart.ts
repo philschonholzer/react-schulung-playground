@@ -1,24 +1,56 @@
-import { create } from "zustand";
 import type { Article } from "../../domain/article/types";
-import {
-  addArticleToExistingArticles,
-  calculateTotalPriceFromArticles,
-} from "../../domain/cart";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-type Cart = {
-  articles: Article[];
+const getCart = async () => {
+  console.log("getting cart...");
+
+  const data = await fetch("http://127.0.0.1:3004/cart");
+  const cart = await data.json();
+  console.log("got cart!");
+  return cart as { articles: Article[] };
 };
 
-const useCartStore = create<Cart>()(() => ({
-  articles: [],
-}));
+const updateCart =
+  (existingArticles: Article[] | undefined) =>
+  async (newArticle: Article): Promise<void> => {
+    console.log("updating...", newArticle, existingArticles);
 
-export const useArticles = () => useCartStore((state) => state.articles);
+    const data = await fetch("http://127.0.0.1:3004/cart", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        articles: [newArticle, ...(existingArticles ?? [])],
+      }),
+    });
 
-export const useTotalPrice = () =>
-  useCartStore((state) => calculateTotalPriceFromArticles(state.articles));
+    const response = await data.json();
+    console.log("updated!", response);
+    return response;
+  };
 
-export const addArticle = (article: Article) =>
-  useCartStore.setState((state: Cart) => ({
-    articles: addArticleToExistingArticles(state.articles, article),
-  }));
+export default function useCart() {
+  const queryClient = useQueryClient();
+
+  // Queries
+  const query = useQuery({ queryKey: ["cart"], queryFn: getCart });
+
+  const cart = queryClient.getQueryData(["cart"]) as
+    | {
+        articles: Article[];
+      }
+    | undefined;
+  // Mutations
+  const mutation = useMutation({
+    mutationFn: updateCart(cart?.articles),
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+  return {
+    query,
+    mutation,
+  };
+}
