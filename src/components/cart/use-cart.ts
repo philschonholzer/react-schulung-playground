@@ -1,5 +1,15 @@
 import type { Article } from "../../domain/article/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useMutationState,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { addArticleToExistingArticles } from "../../domain/cart";
+
+type Cart = {
+  articles: Article[];
+};
 
 const getCart = async () => {
   console.log("getting cart...");
@@ -7,7 +17,7 @@ const getCart = async () => {
   const data = await fetch("http://127.0.0.1:3004/cart");
   const cart = await data.json();
   console.log("got cart!");
-  return cart as { articles: Article[] };
+  return cart as Cart;
 };
 
 const updateCart =
@@ -21,7 +31,10 @@ const updateCart =
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        articles: [newArticle, ...(existingArticles ?? [])],
+        articles: addArticleToExistingArticles(
+          existingArticles ?? [],
+          newArticle,
+        ),
       }),
     });
 
@@ -36,21 +49,24 @@ export default function useCart() {
   // Queries
   const query = useQuery({ queryKey: ["cart"], queryFn: getCart });
 
-  const cart = queryClient.getQueryData(["cart"]) as
-    | {
-        articles: Article[];
-      }
-    | undefined;
+  const cart = queryClient.getQueryData(["cart"]) as Cart | undefined;
   // Mutations
   const mutation = useMutation({
     mutationFn: updateCart(cart?.articles),
-    onSuccess: () => {
+    onSettled: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      return queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
+    mutationKey: ["cart"],
+  });
+
+  const variables = useMutationState<Article>({
+    filters: { mutationKey: ["cart"], status: "pending" },
+    select: (mutation) => mutation.state.variables as Article,
   });
   return {
     query,
     mutation,
+    variables,
   };
 }
